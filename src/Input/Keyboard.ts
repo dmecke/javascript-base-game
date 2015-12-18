@@ -1,6 +1,6 @@
 class Keyboard
 {
-    private keys;
+    private keys: Array<number> = [];
     static KEY_ENTER: number = 13;
     static KEY_SPACE: number = 32;
     static KEY_LEFT: number = 37;
@@ -14,19 +14,20 @@ class Keyboard
 
     constructor()
     {
-        this.keys = [];
+        document.addEventListener('keydown', this.addKey.bind(this), true);
+        document.addEventListener('keyup', this.removeKey.bind(this), true);
     }
 
-    addKey(keyCode)
+    addKey(event: KeyboardEvent)
     {
-        if (-1 == this.keys.indexOf(keyCode)) {
-            this.keys.push(keyCode);
+        if (-1 == this.keys.indexOf(event.keyCode)) {
+            this.keys.push(event.keyCode);
         }
     }
 
-    removeKey(keyCode)
+    removeKey(event: KeyboardEvent)
     {
-        var index = this.keys.indexOf(keyCode);
+        var index = this.keys.indexOf(event.keyCode);
         if (index != -1) {
             this.keys.splice(index, 1);
         }
@@ -69,4 +70,4 @@ class Keyboard
     }
 }
 
-export default new Keyboard();
+export default Keyboard;

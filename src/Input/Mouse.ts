@@ -11,6 +11,10 @@ class Mouse
     {
         this.position = new Vector(0, 0);
         this.buttons = [0, 0, 0];
+
+        document.addEventListener('mousemove', this.updatePosition.bind(this), true);
+        document.addEventListener('mousedown', this.buttonDown.bind(this), true);
+        document.addEventListener('mouseup', this.buttonUp.bind(this), true);
     }
 
     updatePosition(event: MouseEvent): void
@@ -38,4 +42,4 @@ class Mouse
     }
 }
 
-export default new Mouse();
+export default Mouse;

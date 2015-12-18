@@ -1,19 +1,20 @@
 import Vector from  "./../Math/Vector";
-import keyboard from "./../Input/Keyboard";
 import Circle from "./../Graphics/Circle";
 import Rectangle from "./../Graphics/Rectangle";
 import Square from "./../Graphics/Square";
-import mouse from "./../Input/Mouse";
+import Input from "../Input/Input";
 
 class Player
 {
+    private input: Input;
     private position: Vector;
 
     constructor(position: Vector)
     {
+        this.input = Input.create();
         this.position = position;
 
-        mouse.onMove(this.onMouseMove.bind(this));
+        this.input.mouse.onMove(this.onMouseMove.bind(this));
     }
 
     update(): void
@@ -30,7 +31,7 @@ class Player
 
     onMouseMove(): void
     {
-        this.position = mouse.position;
+        this.position = this.input.mouse.position;
     }
 }
 
