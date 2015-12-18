@@ -1,5 +1,5 @@
 var canvas = <HTMLCanvasElement> document.getElementById('canvas');
-canvas.width = 800;
-canvas.height = 600;
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
 export default canvas;
