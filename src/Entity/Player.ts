@@ -3,8 +3,9 @@ import Circle from "./../Graphics/Circle";
 import Rectangle from "./../Graphics/Rectangle";
 import Square from "./../Graphics/Square";
 import Input from "../Input/Input";
+import GameLoop from "../Game/GameLoop";
 
-class Player
+class Player implements GameLoop
 {
     private input: Input;
     private position: Vector;
@@ -17,11 +18,11 @@ class Player
         this.input.mouse.onMove(this.onMouseMove.bind(this));
     }
 
-    update(): void
+    public update(): void
     {
     }
 
-    render(): void
+    public render(): void
     {
         new Circle(this.position, 10, 'red').draw();
         new Rectangle(this.position, 40, 20, 'blue').draw();
@@ -29,7 +30,7 @@ class Player
         new Square(this.position, 50, 'green').draw();
     }
 
-    onMouseMove(): void
+    private onMouseMove(): void
     {
         this.position = this.input.mouse.position;
     }

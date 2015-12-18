@@ -5,7 +5,7 @@ class Circle extends Shape
 {
     private radius: number;
 
-    constructor(position: Vector, radius: number, strokeStyle:string = 'transparent', fillStyle:string = 'transparent')
+    constructor(position: Vector, radius: number, strokeStyle: string = 'transparent', fillStyle: string = 'transparent')
     {
         super(position, strokeStyle, fillStyle);
         this.radius = radius;
