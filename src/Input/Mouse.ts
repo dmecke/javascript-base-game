@@ -1,44 +1,70 @@
 import Vector from './../Math/Vector';
 import canvas from './../System/Canvas';
+import Timer from "../Util/Timer";
 
 class Mouse
 {
-    public position: Vector;
-    private buttons: Array<number> = [];
-    private onMoveCallbacks: Array<Function> = [];
+    public static position:Vector = new Vector(0, 0);
+    private static click = false;
+    public static timer = new Timer(30);
+    private static onMoveCallbacks:Array<Function> = [];
 
-    constructor()
+    public static init():void
     {
-        this.position = new Vector(0, 0);
-        this.buttons = [0, 0, 0];
+        document.addEventListener('mousemove', Mouse.mouseMove.bind(this), true);
+        document.addEventListener('mousedown', Mouse.mouseDown.bind(this), true);
+        document.addEventListener('mouseup', Mouse.mouseUp.bind(this), true);
+        document.addEventListener('touchstart', Mouse.touchStart.bind(this), true);
+        document.addEventListener('touchend', Mouse.touchEnd.bind(this), true);
 
-        document.addEventListener('mousemove', this.updatePosition.bind(this), true);
-        document.addEventListener('mousedown', this.buttonDown.bind(this), true);
-        document.addEventListener('mouseup', this.buttonUp.bind(this), true);
+        setInterval(function() {
+            Mouse.timer.update();
+        }, 1 / 30);
     }
 
-    updatePosition(event: MouseEvent): void
+    public static mouseMove(event:MouseEvent):void
+    {
+        Mouse.updatePosition(new Vector(event.clientX, event.clientY));
+    }
+
+    public static updatePosition(position:Vector):void
     {
         var canvasRect = canvas.getBoundingClientRect();
-        this.position = new Vector(event.clientX - canvasRect.left, event.clientY - canvasRect.top);
-        this.onMoveCallbacks.forEach(function(callback) {
+        Mouse.position = position.subtract(new Vector(canvasRect.left, canvasRect.top));
+        Mouse.onMoveCallbacks.forEach(function(callback) {
             callback();
         });
     }
 
-    buttonDown(event: MouseEvent): void
+    public static mouseDown():void
     {
-        this.buttons[event.button] = 1;
+        Mouse.click = true;
     }
 
-    buttonUp(event: MouseEvent): void
+    public static mouseUp():void
     {
-        this.buttons[event.button] = 0;
+        Mouse.click = false;
     }
 
-    onMove(callback: Function): void
+    public static touchStart(event:TouchEvent):void
     {
-        this.onMoveCallbacks.push(callback);
+        Mouse.updatePosition(new Vector(event.changedTouches[0].pageX, event.changedTouches[0].pageY));
+        Mouse.mouseDown();
+    }
+
+    public static touchEnd():void
+    {
+        Mouse.mouseUp();
+    }
+
+    public static onMove(callback: Function):void
+    {
+        Mouse.onMoveCallbacks.push(callback);
+    }
+
+    public static clicked():boolean
+    {
+        return Mouse.click && Mouse.timer.isReady();
     }
 }
 

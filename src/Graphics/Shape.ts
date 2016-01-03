@@ -1,27 +1,42 @@
-import context from "../System/Context";
 import Vector from "../Math/Vector";
-import Paper from "./Paper";
+import context from "../System/Context";
 
 abstract class Shape
 {
-    protected paper: Paper;
-    protected position: Vector;
-    protected strokeStyle: string;
-    protected fillStyle: string;
+    protected position:Vector = new Vector(0, 0);
+    protected strokeStyle:string = 'transparent';
+    protected fillStyle:string = 'transparent';
+    protected lineWidth:number = 1;
 
-    constructor(position: Vector, strokeStyle:string = 'transparent', fillStyle:string = 'transparent')
+    public at(position:Vector):this
     {
-        this.paper = new Paper(context);
         this.position = position;
-        this.strokeStyle = strokeStyle;
-        this.fillStyle = fillStyle;
+
+        return this;
     }
 
-    draw()
+    public withStrokeStyle(strokeStyle:string):this
     {
-        this.paper.strokeStyle(this.strokeStyle);
-        this.paper.fillStyle(this.fillStyle);
+        this.strokeStyle = strokeStyle;
+
+        return this;
     }
+
+    public withFillStyle(fillStyle:string):this
+    {
+        this.fillStyle = fillStyle;
+
+        return this;
+    }
+
+    public withLineWidth(lineWidth:number):this
+    {
+        this.lineWidth = lineWidth;
+
+        return this;
+    }
+
+    public abstract draw():void;
 }
 
 export default Shape;

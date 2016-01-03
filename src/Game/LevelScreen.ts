@@ -3,14 +3,14 @@ import Player from "../Entity/Player";
 
 class LevelScreen extends GameScreen
 {
-    public player: Player;
+    public player:Player;
 
-    public update(): void
+    public update():void
     {
         this.player.update();
     }
 
-    public render(): void
+    public render():void
     {
         this.player.render();
     }

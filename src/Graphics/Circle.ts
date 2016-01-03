@@ -1,24 +1,28 @@
+import Context from "./../System/Context";
 import Shape from "./Shape";
 import Vector from "../Math/Vector";
 
 class Circle extends Shape
 {
-    private radius: number;
+    private radius: number = 10;
 
-    constructor(position: Vector, radius: number, strokeStyle: string = 'transparent', fillStyle: string = 'transparent')
+    public withRadius(radius:number):this
     {
-        super(position, strokeStyle, fillStyle);
         this.radius = radius;
+
+        return this;
     }
 
-    draw(): void
+    draw():void
     {
-        super.draw();
-        this.paper.beginPath();
-        this.paper.arc(this.position, this.radius, 0, 2 * Math.PI);
-        this.paper.stroke();
-        this.paper.fill();
-        this.paper.closePath();
+        Context.fillStyle = this.fillStyle.toString();
+        Context.strokeStyle = this.strokeStyle.toString();
+        Context.lineWidth = this.lineWidth;
+        Context.beginPath();
+        Context.arc(this.position.x(), this.position.y(), this.radius, 0, 2 * Math.PI);
+        Context.stroke();
+        Context.fill();
+        Context.closePath();
     }
 }
 

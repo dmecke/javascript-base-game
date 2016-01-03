@@ -50,11 +50,36 @@
 	
 	var _Game2 = _interopRequireDefault(_Game);
 	
+	var _LevelScreen = __webpack_require__(4);
+	
+	var _LevelScreen2 = _interopRequireDefault(_LevelScreen);
+	
+	var _MenuScreen = __webpack_require__(6);
+	
+	var _MenuScreen2 = _interopRequireDefault(_MenuScreen);
+	
+	var _Player = __webpack_require__(10);
+	
+	var _Player2 = _interopRequireDefault(_Player);
+	
+	var _Vector = __webpack_require__(9);
+	
+	var _Vector2 = _interopRequireDefault(_Vector);
+	
+	var _Canvas = __webpack_require__(3);
+	
+	var _Canvas2 = _interopRequireDefault(_Canvas);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	__webpack_require__(14);
 	
-	new _Game2.default().run();
+	var game = new _Game2.default(new _Vector2.default(_Canvas2.default.width, _Canvas2.default.height));
+	
+	new _MenuScreen2.default(game).activate();
+	new _LevelScreen2.default(game).player = new _Player2.default(new _Vector2.default(100, 100));
+	
+	game.run();
 
 /***/ },
 /* 1 */
@@ -62,22 +87,29 @@
 
 	var Context_1 = __webpack_require__(2);
 	var Canvas_1 = __webpack_require__(3);
-	var Player_1 = __webpack_require__(4);
-	var Vector_1 = __webpack_require__(9);
 	var Game = (function () {
-	    function Game() {
-	        this.player = new Player_1["default"](new Vector_1["default"](100, 100));
+	    function Game(dimensions) {
+	        this.screens = [];
+	        this.dimensions = dimensions;
 	    }
 	    Game.prototype.run = function () {
 	        setInterval(this.update.bind(this), 1 / Game.FPS);
 	        setInterval(this.render.bind(this), 1 / Game.FPS);
 	    };
 	    Game.prototype.update = function () {
-	        this.player.update();
+	        this.screens.forEach(function (screen) {
+	            if (screen.isActive) {
+	                screen.update();
+	            }
+	        });
 	    };
 	    Game.prototype.render = function () {
 	        Context_1["default"].clearRect(0, 0, Canvas_1["default"].width, Canvas_1["default"].height);
-	        this.player.render();
+	        this.screens.forEach(function (screen) {
+	            if (screen.isActive) {
+	                screen.render();
+	            }
+	        });
 	    };
 	    Game.FPS = 30;
 	    return Game;
@@ -111,130 +143,83 @@
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Circle_1 = __webpack_require__(5);
-	var Rectangle_1 = __webpack_require__(8);
-	var Square_1 = __webpack_require__(10);
-	var Input_1 = __webpack_require__(11);
-	var Player = (function () {
-	    function Player(position) {
-	        this.input = Input_1["default"].create();
-	        this.position = position;
-	        this.input.mouse.onMove(this.onMouseMove.bind(this));
-	    }
-	    Player.prototype.update = function () {
-	    };
-	    Player.prototype.render = function () {
-	        new Circle_1["default"](this.position, 10, 'red').draw();
-	        new Rectangle_1["default"](this.position, 40, 20, 'blue').draw();
-	        new Square_1["default"](this.position, 30, 'green').draw();
-	        new Square_1["default"](this.position, 50, 'green').draw();
-	    };
-	    Player.prototype.onMouseMove = function () {
-	        this.position = this.input.mouse.position;
-	    };
-	    return Player;
-	})();
-	exports.__esModule = true;
-	exports["default"] = Player;
-
-
-/***/ },
-/* 5 */
-/***/ function(module, exports, __webpack_require__) {
-
 	var __extends = (this && this.__extends) || function (d, b) {
 	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var Shape_1 = __webpack_require__(6);
-	var Circle = (function (_super) {
-	    __extends(Circle, _super);
-	    function Circle(position, radius, strokeStyle, fillStyle) {
-	        if (strokeStyle === void 0) { strokeStyle = 'transparent'; }
-	        if (fillStyle === void 0) { fillStyle = 'transparent'; }
-	        _super.call(this, position, strokeStyle, fillStyle);
-	        this.radius = radius;
+	var GameScreen_1 = __webpack_require__(5);
+	var LevelScreen = (function (_super) {
+	    __extends(LevelScreen, _super);
+	    function LevelScreen() {
+	        _super.apply(this, arguments);
 	    }
-	    Circle.prototype.draw = function () {
-	        _super.prototype.draw.call(this);
-	        this.paper.beginPath();
-	        this.paper.arc(this.position, this.radius, 0, 2 * Math.PI);
-	        this.paper.stroke();
-	        this.paper.fill();
-	        this.paper.closePath();
+	    LevelScreen.prototype.update = function () {
+	        this.player.update();
 	    };
-	    return Circle;
-	})(Shape_1["default"]);
+	    LevelScreen.prototype.render = function () {
+	        this.player.render();
+	    };
+	    return LevelScreen;
+	})(GameScreen_1["default"]);
 	exports.__esModule = true;
-	exports["default"] = Circle;
+	exports["default"] = LevelScreen;
+
+
+/***/ },
+/* 5 */
+/***/ function(module, exports) {
+
+	var GameScreen = (function () {
+	    function GameScreen(game) {
+	        this.isActive = false;
+	        this.game = game;
+	        this.game.screens.push(this);
+	    }
+	    GameScreen.prototype.activate = function () {
+	        this.isActive = true;
+	    };
+	    GameScreen.prototype.deactivate = function () {
+	        this.isActive = false;
+	    };
+	    return GameScreen;
+	})();
+	exports.__esModule = true;
+	exports["default"] = GameScreen;
 
 
 /***/ },
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Context_1 = __webpack_require__(2);
-	var Paper_1 = __webpack_require__(7);
-	var Shape = (function () {
-	    function Shape(position, strokeStyle, fillStyle) {
-	        if (strokeStyle === void 0) { strokeStyle = 'transparent'; }
-	        if (fillStyle === void 0) { fillStyle = 'transparent'; }
-	        this.paper = new Paper_1["default"](Context_1["default"]);
-	        this.position = position;
-	        this.strokeStyle = strokeStyle;
-	        this.fillStyle = fillStyle;
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var GameScreen_1 = __webpack_require__(5);
+	var Text_1 = __webpack_require__(7);
+	var LevelScreen = (function (_super) {
+	    __extends(LevelScreen, _super);
+	    function LevelScreen() {
+	        _super.apply(this, arguments);
 	    }
-	    Shape.prototype.draw = function () {
-	        this.paper.strokeStyle(this.strokeStyle);
-	        this.paper.fillStyle(this.fillStyle);
+	    LevelScreen.prototype.update = function () {
 	    };
-	    return Shape;
-	})();
+	    LevelScreen.prototype.render = function () {
+	        new Text_1["default"]('Javascript Base Game')
+	            .at(this.game.dimensions.divide(2))
+	            .withFillStyle('blue')
+	            .draw();
+	    };
+	    return LevelScreen;
+	})(GameScreen_1["default"]);
 	exports.__esModule = true;
-	exports["default"] = Shape;
+	exports["default"] = LevelScreen;
 
 
 /***/ },
 /* 7 */
-/***/ function(module, exports) {
-
-	var Paper = (function () {
-	    function Paper(context) {
-	        this.context = context;
-	    }
-	    Paper.prototype.strokeStyle = function (style) {
-	        this.context.strokeStyle = style;
-	    };
-	    Paper.prototype.fillStyle = function (style) {
-	        this.context.fillStyle = style;
-	    };
-	    Paper.prototype.arc = function (position, radius, startAngle, endAngle) {
-	        this.context.arc(position.x(), position.y(), radius, startAngle, endAngle);
-	    };
-	    Paper.prototype.rect = function (position, width, height) {
-	        this.context.rect(position.x(), position.y(), width, height);
-	    };
-	    Paper.prototype.beginPath = function () {
-	        this.context.beginPath();
-	    };
-	    Paper.prototype.closePath = function () {
-	        this.context.closePath();
-	    };
-	    Paper.prototype.stroke = function () {
-	        this.context.stroke();
-	    };
-	    Paper.prototype.fill = function () {
-	        this.context.fill();
-	    };
-	    return Paper;
-	})();
-	exports.__esModule = true;
-	exports["default"] = Paper;
-
-
-/***/ },
-/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __extends = (this && this.__extends) || function (d, b) {
@@ -242,30 +227,102 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var Shape_1 = __webpack_require__(6);
-	var Vector_1 = __webpack_require__(9);
-	var Rectangle = (function (_super) {
-	    __extends(Rectangle, _super);
-	    function Rectangle(position, width, height, strokeStyle, fillStyle) {
-	        if (strokeStyle === void 0) { strokeStyle = 'transparent'; }
-	        if (fillStyle === void 0) { fillStyle = 'transparent'; }
-	        _super.call(this, position, strokeStyle, fillStyle);
-	        this.width = width;
-	        this.height = height;
+	var Context_1 = __webpack_require__(2);
+	var Shape_1 = __webpack_require__(8);
+	var Text = (function (_super) {
+	    __extends(Text, _super);
+	    function Text(content) {
+	        _super.call(this);
+	        this.fontSize = 12;
+	        this.font = 'Oswald';
+	        this.textAlign = 'center';
+	        this.lineHeight = 38;
+	        this.content = content;
 	    }
-	    Rectangle.prototype.draw = function () {
-	        var position = this.position.subtract(new Vector_1["default"](this.width / 2, this.height / 2));
-	        _super.prototype.draw.call(this);
-	        this.paper.beginPath();
-	        this.paper.rect(position, this.width, this.height);
-	        this.paper.stroke();
-	        this.paper.fill();
-	        this.paper.closePath();
+	    Text.prototype.withFont = function (font) {
+	        this.font = font;
+	        return this;
 	    };
-	    return Rectangle;
+	    Text.prototype.withFontSize = function (fontSize) {
+	        this.fontSize = fontSize;
+	        return this;
+	    };
+	    Text.prototype.leftAligned = function () {
+	        this.textAlign = 'left';
+	        return this;
+	    };
+	    Text.prototype.withMaxWidth = function (maxWidth) {
+	        this.maxWidth = maxWidth;
+	        return this;
+	    };
+	    Text.prototype.withLineHeight = function (lineHeight) {
+	        this.lineHeight = lineHeight;
+	        return this;
+	    };
+	    Text.prototype.draw = function () {
+	        Context_1["default"].font = this.fontSize.toString() + 'px "' + this.font + '"';
+	        Context_1["default"].fillStyle = this.fillStyle;
+	        Context_1["default"].strokeStyle = this.strokeStyle;
+	        Context_1["default"].lineWidth = this.lineWidth;
+	        Context_1["default"].textAlign = this.textAlign;
+	        var words = this.content.split(' ');
+	        var line = '';
+	        var y = this.position.y();
+	        for (var word = 0; word < words.length; word++) {
+	            var testLine = line + words[word] + ' ';
+	            var metrics = Context_1["default"].measureText(testLine);
+	            var testWidth = metrics.width;
+	            if (this.maxWidth && testWidth > this.maxWidth) {
+	                Context_1["default"].strokeText(line, this.position.x(), y);
+	                Context_1["default"].fillText(line, this.position.x(), y);
+	                line = words[word] + ' ';
+	                y += this.lineHeight;
+	            }
+	            else {
+	                line = testLine;
+	            }
+	        }
+	        Context_1["default"].strokeText(line.trim(), this.position.x(), y);
+	        Context_1["default"].fillText(line.trim(), this.position.x(), y);
+	    };
+	    return Text;
 	})(Shape_1["default"]);
 	exports.__esModule = true;
-	exports["default"] = Rectangle;
+	exports["default"] = Text;
+
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Vector_1 = __webpack_require__(9);
+	var Shape = (function () {
+	    function Shape() {
+	        this.position = new Vector_1["default"](0, 0);
+	        this.strokeStyle = 'transparent';
+	        this.fillStyle = 'transparent';
+	        this.lineWidth = 1;
+	    }
+	    Shape.prototype.at = function (position) {
+	        this.position = position;
+	        return this;
+	    };
+	    Shape.prototype.withStrokeStyle = function (strokeStyle) {
+	        this.strokeStyle = strokeStyle;
+	        return this;
+	    };
+	    Shape.prototype.withFillStyle = function (fillStyle) {
+	        this.fillStyle = fillStyle;
+	        return this;
+	    };
+	    Shape.prototype.withLineWidth = function (lineWidth) {
+	        this.lineWidth = lineWidth;
+	        return this;
+	    };
+	    return Shape;
+	})();
+	exports.__esModule = true;
+	exports["default"] = Shape;
 
 
 /***/ },
@@ -312,145 +369,162 @@
 /* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var Rectangle_1 = __webpack_require__(8);
-	var Square = (function (_super) {
-	    __extends(Square, _super);
-	    function Square(position, size, strokeStyle, fillStyle) {
-	        if (strokeStyle === void 0) { strokeStyle = 'transparent'; }
-	        if (fillStyle === void 0) { fillStyle = 'transparent'; }
-	        _super.call(this, position, size, size, strokeStyle, fillStyle);
+	var Circle_1 = __webpack_require__(11);
+	var Rectangle_1 = __webpack_require__(12);
+	var Square_1 = __webpack_require__(13);
+	var Player = (function () {
+	    function Player(position) {
+	        this.position = position;
 	    }
-	    return Square;
-	})(Rectangle_1["default"]);
+	    Player.prototype.update = function () {
+	    };
+	    Player.prototype.render = function () {
+	        new Circle_1["default"]()
+	            .at(this.position)
+	            .withRadius(10)
+	            .withFillStyle('red')
+	            .draw();
+	        new Rectangle_1["default"]()
+	            .at(this.position)
+	            .withWidth(40)
+	            .withHeight(20)
+	            .withFillStyle('blue')
+	            .draw();
+	        new Square_1["default"]()
+	            .at(this.position)
+	            .withSize(30)
+	            .withFillStyle('green')
+	            .draw();
+	        new Square_1["default"]()
+	            .at(this.position)
+	            .withSize(50)
+	            .withFillStyle('green')
+	            .draw();
+	    };
+	    return Player;
+	})();
 	exports.__esModule = true;
-	exports["default"] = Square;
+	exports["default"] = Player;
 
 
 /***/ },
 /* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Mouse_1 = __webpack_require__(12);
-	var Keyboard_1 = __webpack_require__(13);
-	var Input = (function () {
-	    function Input() {
-	        this.mouse = new Mouse_1["default"]();
-	        this.keyboard = new Keyboard_1["default"]();
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var Context_1 = __webpack_require__(2);
+	var Shape_1 = __webpack_require__(8);
+	var Circle = (function (_super) {
+	    __extends(Circle, _super);
+	    function Circle() {
+	        _super.apply(this, arguments);
+	        this.radius = 10;
 	    }
-	    Input.create = function () {
-	        if (!Input.instance) {
-	            Input.instance = new Input();
-	        }
-	        return Input.instance;
+	    Circle.prototype.withRadius = function (radius) {
+	        this.radius = radius;
+	        return this;
 	    };
-	    return Input;
-	})();
+	    Circle.prototype.draw = function () {
+	        Context_1["default"].fillStyle = this.fillStyle.toString();
+	        Context_1["default"].strokeStyle = this.strokeStyle.toString();
+	        Context_1["default"].lineWidth = this.lineWidth;
+	        Context_1["default"].beginPath();
+	        Context_1["default"].arc(this.position.x(), this.position.y(), this.radius, 0, 2 * Math.PI);
+	        Context_1["default"].stroke();
+	        Context_1["default"].fill();
+	        Context_1["default"].closePath();
+	    };
+	    return Circle;
+	})(Shape_1["default"]);
 	exports.__esModule = true;
-	exports["default"] = Input;
+	exports["default"] = Circle;
 
 
 /***/ },
 /* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var Context_1 = __webpack_require__(2);
+	var Shape_1 = __webpack_require__(8);
 	var Vector_1 = __webpack_require__(9);
-	var Canvas_1 = __webpack_require__(3);
-	var Mouse = (function () {
-	    function Mouse() {
-	        this.buttons = [];
-	        this.onMoveCallbacks = [];
-	        this.position = new Vector_1["default"](0, 0);
-	        this.buttons = [0, 0, 0];
-	        document.addEventListener('mousemove', this.updatePosition.bind(this), true);
-	        document.addEventListener('mousedown', this.buttonDown.bind(this), true);
-	        document.addEventListener('mouseup', this.buttonUp.bind(this), true);
+	var Rectangle = (function (_super) {
+	    __extends(Rectangle, _super);
+	    function Rectangle() {
+	        _super.apply(this, arguments);
+	        this.width = 10;
+	        this.height = 10;
 	    }
-	    Mouse.prototype.updatePosition = function (event) {
-	        var canvasRect = Canvas_1["default"].getBoundingClientRect();
-	        this.position = new Vector_1["default"](event.clientX - canvasRect.left, event.clientY - canvasRect.top);
-	        this.onMoveCallbacks.forEach(function (callback) {
-	            callback();
-	        });
+	    Rectangle.prototype.withWidth = function (width) {
+	        this.width = width;
+	        return this;
 	    };
-	    Mouse.prototype.buttonDown = function (event) {
-	        this.buttons[event.button] = 1;
+	    Rectangle.prototype.withHeight = function (height) {
+	        this.height = height;
+	        return this;
 	    };
-	    Mouse.prototype.buttonUp = function (event) {
-	        this.buttons[event.button] = 0;
+	    Rectangle.prototype.draw = function () {
+	        var position = this.position.subtract(new Vector_1["default"](this.width / 2, this.height / 2));
+	        Context_1["default"].fillStyle = this.fillStyle;
+	        Context_1["default"].strokeStyle = this.strokeStyle;
+	        Context_1["default"].lineWidth = this.lineWidth;
+	        Context_1["default"].beginPath();
+	        Context_1["default"].rect(position.x(), position.y(), this.width, this.height);
+	        Context_1["default"].stroke();
+	        Context_1["default"].fill();
+	        Context_1["default"].closePath();
 	    };
-	    Mouse.prototype.onMove = function (callback) {
-	        this.onMoveCallbacks.push(callback);
-	    };
-	    return Mouse;
-	})();
+	    return Rectangle;
+	})(Shape_1["default"]);
 	exports.__esModule = true;
-	exports["default"] = Mouse;
+	exports["default"] = Rectangle;
 
 
 /***/ },
 /* 13 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
-	var Keyboard = (function () {
-	    function Keyboard() {
-	        this.keys = [];
-	        document.addEventListener('keydown', this.addKey.bind(this), true);
-	        document.addEventListener('keyup', this.removeKey.bind(this), true);
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var Context_1 = __webpack_require__(2);
+	var Vector_1 = __webpack_require__(9);
+	var Shape_1 = __webpack_require__(8);
+	var Square = (function (_super) {
+	    __extends(Square, _super);
+	    function Square() {
+	        _super.apply(this, arguments);
+	        this.size = 10;
 	    }
-	    Keyboard.prototype.addKey = function (event) {
-	        if (-1 == this.keys.indexOf(event.keyCode)) {
-	            this.keys.push(event.keyCode);
-	        }
+	    Square.prototype.withSize = function (size) {
+	        this.size = size;
+	        return this;
 	    };
-	    Keyboard.prototype.removeKey = function (event) {
-	        var index = this.keys.indexOf(event.keyCode);
-	        if (index != -1) {
-	            this.keys.splice(index, 1);
-	        }
+	    Square.prototype.draw = function () {
+	        var position = this.position.subtract(new Vector_1["default"](this.size / 2, this.size / 2));
+	        Context_1["default"].fillStyle = this.fillStyle;
+	        Context_1["default"].strokeStyle = this.strokeStyle;
+	        Context_1["default"].lineWidth = this.lineWidth;
+	        Context_1["default"].beginPath();
+	        Context_1["default"].rect(position.x(), position.y(), this.size, this.size);
+	        Context_1["default"].stroke();
+	        Context_1["default"].fill();
+	        Context_1["default"].closePath();
 	    };
-	    Keyboard.prototype.isUp = function () {
-	        if (-1 != this.keys.indexOf(Keyboard.KEY_UP)) {
-	            return true;
-	        }
-	        return -1 != this.keys.indexOf(Keyboard.KEY_W);
-	    };
-	    Keyboard.prototype.isDown = function () {
-	        if (-1 != this.keys.indexOf(Keyboard.KEY_DOWN)) {
-	            return true;
-	        }
-	        return -1 != this.keys.indexOf(Keyboard.KEY_S);
-	    };
-	    Keyboard.prototype.isLeft = function () {
-	        if (-1 != this.keys.indexOf(Keyboard.KEY_LEFT)) {
-	            return true;
-	        }
-	        return -1 != this.keys.indexOf(Keyboard.KEY_A);
-	    };
-	    Keyboard.prototype.isRight = function () {
-	        if (-1 != this.keys.indexOf(Keyboard.KEY_RIGHT)) {
-	            return true;
-	        }
-	        return -1 != this.keys.indexOf(Keyboard.KEY_D);
-	    };
-	    Keyboard.KEY_ENTER = 13;
-	    Keyboard.KEY_SPACE = 32;
-	    Keyboard.KEY_LEFT = 37;
-	    Keyboard.KEY_UP = 38;
-	    Keyboard.KEY_RIGHT = 39;
-	    Keyboard.KEY_DOWN = 40;
-	    Keyboard.KEY_A = 65;
-	    Keyboard.KEY_D = 68;
-	    Keyboard.KEY_S = 83;
-	    Keyboard.KEY_W = 87;
-	    return Keyboard;
-	})();
+	    return Square;
+	})(Shape_1["default"]);
 	exports.__esModule = true;
-	exports["default"] = Keyboard;
+	exports["default"] = Square;
 
 
 /***/ },
